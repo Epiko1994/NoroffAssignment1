@@ -29,23 +29,26 @@ const handleLoan = () => {
     }
 }
 
+//Handles the work button functionality
 const handleWork = () => {
     payElement.innerText = `Pay: ${pay + 100}`
     pay = pay + 100;
 }
 
+//Handles the Bank button functionality
 const handleBankPay = () => {
     balanceElement.innerText = `Balance: ${balance + pay}`
     balance = balance + pay;
     payElement.innerText = `Pay: ${pay - pay}`
     pay = pay - pay;
-
 }
- 
+
+//Calls the addComputerToMenu function for every element in the computers array
 const addComputersToMenu = (computers) => {
     computers.forEach(computer => addComputerToMenu(computer));
 }
-    
+
+//Creates and option in the laptop dropdown and adds the current laptop from the computers array to that option
 const addComputerToMenu = (computer) => {
     const laptopElement = document.createElement("option");
     laptopElement.value = computer.id;
