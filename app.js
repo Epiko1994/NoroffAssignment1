@@ -3,14 +3,16 @@ const loanButtonElement = document.getElementById("get-a-loan-button");
 const payElement = document.getElementById("pay-paragraph");
 const bankMoneyButtonElement = document.getElementById("bank-money-button");
 const doWorkButtonElement = document.getElementById("do-work-button");
-const repayLoanButtonElement = document.getElementById("repay-loan-button");
+const repayLoanButtonElement = document.getElementById("repay-loan-button-element");
 const laptopsElement = document.getElementById("laptops-dropdown");
 const computerFeatureListElement = document.getElementById("computer-feature-list");
 
 let computers = [];
-let pay = 0;
-let balance = 0;
+let pay = parseInt(0);
+let balance = parseInt(0);
 let haveLoan = false;
+let loanAmount = parseInt(0);
+
 
 
 fetch("https://noroff-komputer-store-api.herokuapp.com/computers")
@@ -18,32 +20,7 @@ fetch("https://noroff-komputer-store-api.herokuapp.com/computers")
     .then(data => computers = data)
     .then(computers => addComputersToMenu(computers));
 
-const handleLoan = () => {
-    const loanAmount = prompt("Please enter the amount you would like to loan");
-    if(loanAmount <= balance * 2 && haveLoan === false) {
-        balanceElement.innerText = `Balance: ${parseInt(loanAmount) + balance}`;
-        balance = parseInt(loanAmount) + balance;
-        haveLoan = true;
-    } else {
-        alert("We can not approve that loan, sorry");
-    }
-}
-
-//Handles the work button functionality
-const handleWork = () => {
-    payElement.innerText = `Pay: ${pay + 100}`
-    pay = pay + 100;
-}
-
-//Handles the Bank button functionality
-const handleBankPay = () => {
-    balanceElement.innerText = `Balance: ${balance + pay}`
-    balance = balance + pay;
-    payElement.innerText = `Pay: ${pay - pay}`
-    pay = pay - pay;
-}
-
-//Calls the addComputerToMenu function for every element in the computers array
+    //Calls the addComputerToMenu function for every element in the computers array
 const addComputersToMenu = (computers) => {
     computers.forEach(computer => addComputerToMenu(computer));
 }
@@ -56,6 +33,50 @@ const addComputerToMenu = (computer) => {
     laptopsElement.appendChild(laptopElement);
 }
 
+//Handles the work button functionality
+const handleWork = () => {
+    payElement.innerText = `Pay: ${pay + 100}`
+    pay = pay + 100;
+}
+
+//Handles the Bank button functionality
+const handleBankPay = () => {
+    balanceElement.innerText = `Balance: ${parseInt(balance) + parseInt(pay)}`
+    balance = balance + pay;
+    payElement.innerText = `Pay: ${parseInt(pay) - parseInt(pay)}`
+    pay = pay - pay;
+}
+
+//Handles the Get a Loan button functionality
+const handleLoan = () => {
+    const loanAmount = prompt("Please enter the amount you would like to loan");
+    if(loanAmount <= balance * 2 && haveLoan === false) {
+        balanceElement.innerText = `Balance: ${parseInt(loanAmount) + parseInt(balance)}`;
+        balance = loanAmount + balance;
+        
+        haveLoan = true;
+
+        const repayLoanButton = document.createElement("button");
+        repayLoanButton.innerText = `Repay Loan`
+        repayLoanButtonElement.appendChild(repayLoanButton);
+    } else {
+        alert("We can not approve that loan, sorry");
+    }
+}
+
+const handleLoanRepayment = () => {
+    if(balance >= loanAmount) {
+        balance = balance - loanAmount;
+        balanceElement.innerText = `Balance: ${parseInt(balance) - parseInt(loanAmount)}`;
+        loanAmount = loanAmount - loanAmount;
+
+        haveLoan = false;
+    } else {
+        alert("You do not have enough money to pay off your loan")
+    }
+}
+
+repayLoanButtonElement.addEventListener("click", handleLoanRepayment);
 bankMoneyButtonElement.addEventListener("click", handleBankPay);
 doWorkButtonElement.addEventListener("click", handleWork);
 loanButtonElement.addEventListener("click", handleLoan);
