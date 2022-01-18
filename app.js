@@ -10,9 +10,9 @@ const computerFeatureListElement = document.getElementById("computer-feature-lis
 let computers = [];
 let pay = 0;
 let balance = 0;
-let haveLoan = false;
 let loanAmount = 0;
-
+let haveLoan = false;
+let repayLoanButton;
 
 
 fetch("https://noroff-komputer-store-api.herokuapp.com/computers")
@@ -41,23 +41,23 @@ const handleWork = () => {
 
 //Handles the Bank button functionality
 const handleBankPay = () => {
-    balanceElement.innerText = `Balance: ${parseInt(balance) + parseInt(pay)}`
+    balanceElement.innerText = `Balance: ${parseInt(balance) + parseInt(pay)}`;
     balance = balance + pay;
-    payElement.innerText = `Pay: ${parseInt(pay) - parseInt(pay)}`
+    payElement.innerText = `Pay: ${parseInt(pay) - parseInt(pay)}`;
     pay = pay - pay;
 }
 
 //Handles the Get a Loan button functionality
 const handleLoan = () => {
-    const loanAmount = prompt("Please enter the amount you would like to loan",100);
+    loanAmount = prompt("Please enter the amount you would like to loan",100);
     if(loanAmount <= balance * 2 && haveLoan === false) {
         balanceElement.innerText = `Balance: ${parseInt(loanAmount) + parseInt(balance)}`;
         balance = loanAmount + balance;
         
         haveLoan = true;
 
-        const repayLoanButton = document.createElement("button");
-        repayLoanButton.innerText = `Repay Loan`
+        repayLoanButton = document.createElement("button");
+        repayLoanButton.innerText = `Repay Loan`;
         repayLoanButtonElement.appendChild(repayLoanButton);
     } else {
         alert("We can not approve that loan, sorry");
@@ -66,8 +66,9 @@ const handleLoan = () => {
 
 const handleLoanRepayment = () => {
     if(balance >= loanAmount) {
-        balance = balance - loanAmount;
         balanceElement.innerText = `Balance: ${parseInt(balance) - parseInt(loanAmount)}`;
+        //balanceElement.innerText = `Balance: ${parseInt(balance) - parseInt(loanAmount)}`;
+        balance = balance - loanAmount;
         loanAmount = loanAmount - loanAmount;
         repayLoanButtonElement.removeChild(repayLoanButton);
 
