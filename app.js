@@ -8,10 +8,10 @@ const laptopsElement = document.getElementById("laptops-dropdown");
 const computerFeatureListElement = document.getElementById("computer-feature-list");
 
 let computers = [];
-let pay = parseInt(0);
-let balance = parseInt(0);
+let pay = 0;
+let balance = 0;
 let haveLoan = false;
-let loanAmount = parseInt(0);
+let loanAmount = 0;
 
 
 
@@ -49,7 +49,7 @@ const handleBankPay = () => {
 
 //Handles the Get a Loan button functionality
 const handleLoan = () => {
-    const loanAmount = prompt("Please enter the amount you would like to loan");
+    const loanAmount = prompt("Please enter the amount you would like to loan",100);
     if(loanAmount <= balance * 2 && haveLoan === false) {
         balanceElement.innerText = `Balance: ${parseInt(loanAmount) + parseInt(balance)}`;
         balance = loanAmount + balance;
@@ -69,6 +69,7 @@ const handleLoanRepayment = () => {
         balance = balance - loanAmount;
         balanceElement.innerText = `Balance: ${parseInt(balance) - parseInt(loanAmount)}`;
         loanAmount = loanAmount - loanAmount;
+        repayLoanButtonElement.removeChild(repayLoanButton);
 
         haveLoan = false;
     } else {
