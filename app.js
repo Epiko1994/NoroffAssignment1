@@ -5,7 +5,11 @@ const bankMoneyButtonElement = document.getElementById("bank-money-button");
 const doWorkButtonElement = document.getElementById("do-work-button");
 const repayLoanButtonElement = document.getElementById("repay-loan-button-element");
 const laptopsElement = document.getElementById("laptops-dropdown");
-const computerFeatureListElement = document.getElementById("computer-feature-list");
+const computerFeaturesListElement = document.getElementById("computer-feature-list");
+const laptopTitleElement = document.getElementById("laptop-title");
+const laptopDescriptionElement = document.getElementById("laptop-description");
+const laptopPriceElement = document.getElementById("laptop-price");
+const laptopImageElement = document.getElementById("laptop-image");
 
 let computers = [];
 let pay = 0;
@@ -13,6 +17,7 @@ let balance = 0;
 let loanAmount = 0;
 let haveLoan = false;
 let repayLoanButton;
+let outstandingLoan = 0;
 
 
 fetch("https://noroff-komputer-store-api.herokuapp.com/computers")
@@ -23,6 +28,17 @@ fetch("https://noroff-komputer-store-api.herokuapp.com/computers")
     //Calls the addComputerToMenu function for every element in the computers array
 const addComputersToMenu = (computers) => {
     computers.forEach(computer => addComputerToMenu(computer));
+    computerFeaturesListElement.innerText = computers[0].specs;
+    
+    laptopTitleElement.innerText = computers[0].title;
+    
+    laptopDescriptionElement.innerText = computers[0].description;
+    
+    laptopPriceElement.innerText = `${computers[0].price} NOK`;
+
+    const laptopImageAttribute = document.createAttribute("src");
+    laptopImageAttribute.value = `https://noroff-komputer-store-api.herokuapp.com/${computers[0].image}`;
+    laptopImageElement.setAttributeNode(laptopImageAttribute);
 }
 
 //Creates and option in the laptop dropdown and adds the current laptop from the computers array to that option
@@ -33,18 +49,44 @@ const addComputerToMenu = (computer) => {
     laptopsElement.appendChild(laptopElement);
 }
 
+const handleLaptopMenuChange = event => {
+    const selectedLaptop = computers[event.target.selectedIndex];
+    computerFeaturesListElement.innerText = selectedLaptop.specs;
+
+    const laptopImageAttribute = document.createAttribute("src");
+    laptopImageAttribute.value = `https://noroff-komputer-store-api.herokuapp.com/${selectedLaptop.image}`;
+    laptopImageElement.setAttributeNode(laptopImageAttribute);
+
+    laptopTitleElement.innerText = selectedLaptop.title;
+    laptopDescriptionElement.innerText = selectedLaptop.description;
+    laptopPriceElement.innerText = `${selectedLaptop.price} NOK`;
+}
+
 //Handles the work button functionality
 const handleWork = () => {
-    payElement.innerText = `Pay: ${pay + 100}`
+    payElement.innerText = `Pay: ${pay + 100}`;
     pay = pay + 100;
 }
 
 //Handles the Bank button functionality
 const handleBankPay = () => {
-    balanceElement.innerText = `Balance: ${parseInt(balance) + parseInt(pay)}`;
-    balance = balance + pay;
-    payElement.innerText = `Pay: ${parseInt(pay) - parseInt(pay)}`;
-    pay = pay - pay;
+    if(haveLoan === true) {
+        balanceElement.innerText = `Balance: ${parseInt(balance) + (parseInt(pay) * 0.9)}`
+        balance = balance + (pay * 0.9);
+        outstandingLoan -= pay * 0.10;
+        payElement.innerText = `Pay: ${parseInt(pay) - parseInt(pay)}`;
+        pay = pay - pay;
+    }
+    else {
+        balanceElement.innerText = `Balance: ${parseInt(balance) + parseInt(pay)}`;
+        balance = balance + pay;
+        payElement.innerText = `Pay: ${parseInt(pay) - parseInt(pay)}`;
+        pay = pay - pay;
+    }
+    if(outstandingLoan === 0) {
+        repayLoanButtonElement.removeChild(repayLoanButton);
+        haveLoan === false;
+    }
 }
 
 //Handles the Get a Loan button functionality
@@ -52,7 +94,8 @@ const handleLoan = () => {
     loanAmount = prompt("Please enter the amount you would like to loan",100);
     if(loanAmount <= balance * 2 && haveLoan === false) {
         balanceElement.innerText = `Balance: ${parseInt(loanAmount) + parseInt(balance)}`;
-        balance = loanAmount + balance;
+        balance = parseInt(loanAmount) + balance;
+        outstandingLoan = loanAmount;
         
         haveLoan = true;
 
@@ -67,17 +110,27 @@ const handleLoan = () => {
 const handleLoanRepayment = () => {
     if(balance >= loanAmount) {
         balanceElement.innerText = `Balance: ${parseInt(balance) - parseInt(loanAmount)}`;
-        //balanceElement.innerText = `Balance: ${parseInt(balance) - parseInt(loanAmount)}`;
-        balance = balance - loanAmount;
-        loanAmount = loanAmount - loanAmount;
+        balance = balance - parseInt(loanAmount);
+        loanAmount = parseInt(loanAmount) - parseInt(loanAmount);
         repayLoanButtonElement.removeChild(repayLoanButton);
 
         haveLoan = false;
     } else {
-        alert("You do not have enough money to pay off your loan")
+        alert("You do not have enough money to pay off your loan");
     }
 }
 
+const handleFeatureListSplit = (computers) => {
+    let computerFeaturesArray = computers.specs.split(",");
+    for (let index = 0; index < computerFeaturesArray.length; index++) {
+        let computerFeature = document.createElement("li")
+        computerFeature.innerText = `${computerFeaturesArray[index]}`;
+        computerFeaturesListElement.appendChild(computerFeature);
+    }
+}
+
+
+laptopsElement.addEventListener("change", handleLaptopMenuChange);
 repayLoanButtonElement.addEventListener("click", handleLoanRepayment);
 bankMoneyButtonElement.addEventListener("click", handleBankPay);
 doWorkButtonElement.addEventListener("click", handleWork);
