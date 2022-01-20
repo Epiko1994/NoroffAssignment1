@@ -19,7 +19,7 @@ let loanAmount = 0;
 let haveLoan = false;
 let repayLoanButton;
 let selectedLaptop = computers[0];
-let person = {};
+let buyer = {};
 
 
 fetch("https://noroff-komputer-store-api.herokuapp.com/computers")
@@ -42,7 +42,7 @@ const addComputersToMenu = (computers) => {
     const laptopImageAttribute = document.createAttribute("src");
     laptopImageAttribute.value = `https://noroff-komputer-store-api.herokuapp.com/${computers[0].image}`;
     laptopImageElement.setAttributeNode(laptopImageAttribute);
-    return person.currentlyLookingAtPrice = `${computers[0].price}`
+    return buyer.currentlyLookingAtPrice = `${computers[0].price}`
 }
 
 //Creates and option in the laptop dropdown and adds the current laptop from the computers array to that option
@@ -65,7 +65,7 @@ const handleLaptopMenuChange = event => {
     laptopTitleElement.innerText = selectedLaptop.title;
     laptopDescriptionElement.innerText = selectedLaptop.description;
     laptopPriceElement.innerText = `${selectedLaptop.price} NOK`;
-    return person.currentlyLookingAtPrice = `${selectedLaptop.price}`;
+    return buyer.currentlyLookingAtPrice = `${selectedLaptop.price}`;
 }
 
 //Handles the work button functionality
@@ -134,8 +134,7 @@ const handleLoanRepayment = () => {
 }
 
 const handleBuyNow = () => {
-    let laptopPrice = parseInt(person.currentlyLookingAtPrice);
-    console.log(laptopPrice)
+    let laptopPrice = parseInt(buyer.currentlyLookingAtPrice);
     if(balance >= parseInt(laptopPrice)) {
         balance -= parseInt(laptopPrice);
         balanceElement.innerText = `Balance: ${parseInt(balance)}`
